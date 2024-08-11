@@ -1,0 +1,6 @@
+{
+  "exec": "npm run start:bot",
+  "watch": ["../../config", "../../helpers", "../../ports", "../../services", "../bot"],
+  "ignore": ["node_modules", "__tests__"],
+  "delay": 5000
+}
