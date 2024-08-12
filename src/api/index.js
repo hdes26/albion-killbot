@@ -1,6 +1,7 @@
 const config = require("config");
 const Server = require('../../models/server');
 
+const server = new Server();
 
 async function run() {
     if (!config.has("discord.token")) {
@@ -15,16 +16,15 @@ async function run() {
 
     console.log(`Starting Albion-Killbot rest api.`);
 
-    const server = new Server();
 
     server.listen();
 }
 
-async function cleanup(reason) {
+function cleanup(reason) {
     console.log(`Shutting down Api. Reason: ${reason}`);
-    
-    if (api.server) {
-        await api.server.close((error) => process.exit(error ? 1 : 0));
+
+    if (server) {
+        server.close((error) => process.exit(error ? 1 : 0));
     } else {
         process.exit(0);
     }

@@ -8,7 +8,9 @@ class Server {
     constructor() {
         this.app = express();
         this.port = config.get("api.port");
+        this.on = null;
         this.paths = {
+            health: "/health",
             auth: "/auth",
             events: "/events",
             guild: "/guild",
@@ -41,16 +43,21 @@ class Server {
     }
 
     routes() {
+
         //this.app.use(this.paths.auth, require("../routes/auth.routes"));
+        this.app.get(this.paths.health, (req, res) => res.send("all ok !"));
         this.app.use(this.paths.events, require("../routes/events.routes"));
         this.app.use(this.paths.guild, require("../routes/guild.routes"));
     }
 
-
     listen() {
-        this.app.listen(this.port, () => {
+        this.on = this.app.listen(this.port, () => {
             console.log("Server running on the port", this.port);
         });
+    }
+
+    close() {
+        this.on.close();
     }
 }
 
