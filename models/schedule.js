@@ -190,7 +190,7 @@ class Schedule {
         });
 
         //to save members
-        cron.schedule('0 0 * * *', async () => {
+        cron.schedule('30 0 * * *', async () => {
             await this.handleSaveGuildMembers();
         });
 

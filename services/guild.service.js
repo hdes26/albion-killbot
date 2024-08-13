@@ -66,42 +66,52 @@ const getGuilds = async () => {
     return guilds;
 
 }
+
 const saveMembers = async (server) => {
+    try {
+        const guilds = await Guild.find({ active: true });
 
-    const guilds = await Guild.find().where({ active: true });
-
-    if (guilds.length === 0) {
-        console.log('No guild configured.');
-        return;
-    }
-
-    for (const { guild } of guilds) {
-        const { Id, ...rest } = guild._doc;
-
-        const members = await guildMembers(Id, { server });
-
-        if (!members) {
-            continue;
+        if (guilds.length === 0) {
+            console.log('No guilds configured.');
+            return;
         }
 
-        const membersMap = members.map(data => {
-            return { Id: data.Id, Name: data.Name ?? '', }
-        });
+        for (const { guild } of guilds) {
+            const { Id, ...rest } = guild._doc;
 
+            const members = await guildMembers(Id, { server });
 
-        rest.members = membersMap;
+            if (!members) {
+                console.log(`No members found for guild ${Id}.`);
+                continue;
+            }
 
+            const membersMap = members.map(data => ({
+                Id: data.Id,
+                Name: data.Name ?? '',
+            }));
 
-        const save = new Member({ guild_id: Id, ...rest });
+            rest.members = membersMap;
 
-        try {
-            await save.save();
-        } catch (error) {
-            console.error(`Error saving members ${Id}:`, error);
+            const exist = await Member.findOneAndUpdate(
+                { guild_id: Id },
+                { members: membersMap },
+                { new: true, upsert: true } // Creates a new document if it doesn't exist
+            );
+
+            if (!exist) {
+                console.log(`Guild ${Id} does not exist, creating a new entry.`);
+                const newMember = new Member({ guild_id: Id, ...rest });
+                await newMember.save();
+            }
         }
-    }
 
-}
+        console.log('Members saved/updated successfully.');
+    } catch (error) {
+        console.error('An error occurred while saving members:', error);
+    }
+};
+
 
 const getMembers = async (guildId) => {
 
