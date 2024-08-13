@@ -9,7 +9,7 @@ async function run() {
     throw new Error("Please define DISCORD_TOKEN environment variable with the discord token.");
   }
 
-  console.log(`Starting Albion-Killbot.`);
+  console.log(`Starting Albion-Killbot. v1.0.0`);
 
   const botFile = path.join(__dirname, "bot.js");
     
